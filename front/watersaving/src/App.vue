@@ -64,18 +64,8 @@
 
 
     <v-content>
-      <v-container
-        class="fill-height"
-        fluid
-      >
-        <v-row
-          justify="center"
-          align="center"
-        >
-        
-        </v-row>
-      </v-container>
-    </v-content>
+      <router-view/>
+    </v-content>    
 
     <template>
  
