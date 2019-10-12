@@ -1,5 +1,7 @@
 let dbo= require("./server_web.js").dbo;
 let socketTab = require("./server_web.js").socketTab;
+let timers=[]; 
+
 
 exports.receiveData = (req, res) => {
 
@@ -15,11 +17,13 @@ exports.receiveData = (req, res) => {
         //ADD DATA TO MONGODB
         var myobj = json;
         //console.log(json);
-        dbo.collection("captorData").findOne({ "id": parseInt(json.sensor_id) }, function (err, res) {
+
+        dbo.collection("captorData").findOne({ "id": parseInt(json.sensor_id) }, function (err, result) {
             let name='unknow';
+            console.log(result)
             if (err) throw err;
             //console.log(res);
-            if (res == null) {
+            if (result == null) {
                 myobj = {
                     id: parseInt(json.sensor_id),
                     lat: (Math.random() * (+30.0 - +15.0) + +15.0),
@@ -35,14 +39,31 @@ exports.receiveData = (req, res) => {
             }
             else {
                 //ToDO Update
-                name=res.name;
-                res.data.push(json);
+                name=result.name;
+                result.data.push(json);
                 //console.log(res);
                 dbo.collection("captorData").update({ "id": parseInt(json.sensor_id) }, { $push: { data: json } }, function (err, res) {
                     if (err) throw err;
-                   
-                    console.log("1 document inserted");
+                    if( timers[json.sensor_id]!=null){
+                        clearTimeout(timers[json.sensor_id]);
+                    }
+                   timers[json.sensor_id]=setTimeout(function() {
+                    let jsonAlert={
 
+                        "alert":['nodata'],
+                        "name":result.name,
+                        "lat":result.lat,
+                        "long":result.long,
+                        "datatime":result.data[result.data.length-1].datetime,
+                        "level":3
+
+                    };
+                    socketTab.forEach(function (ws) {
+                        ws.send(JSON.stringify(jsonAlert));
+                   })
+                    }, 40000, result);
+
+                    console.log("1 document inserted");
                 });
             }
 
