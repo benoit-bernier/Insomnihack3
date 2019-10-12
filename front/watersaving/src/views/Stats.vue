@@ -253,6 +253,7 @@ export default {
     };
   },
   created() {
+    this.$store.dispatch("changeToolbarState", "Statistiques")
     if (localStorage.getItem("propsWellId") != null) {
       if (parseInt(localStorage.getItem("propsWellId"))) {
         this.name_select.id = parseInt(localStorage.getItem("propsWellId"));
@@ -268,7 +269,6 @@ export default {
         if (this.name_select.id != -1) {
           resp.data.forEach(data => {
             if (data.id == this.name_select.id) {
-              console.log("rere");
               this.name_select.name = data.name;
             }
           });

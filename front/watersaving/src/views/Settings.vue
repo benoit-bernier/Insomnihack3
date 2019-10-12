@@ -128,6 +128,7 @@ export default {
     items: []
   }),
   created() {
+    this.$store.dispatch("changeToolbarState", "Paramètres")
     this.get_all_well();
   },
   methods: {
