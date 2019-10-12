@@ -1,5 +1,9 @@
 const express = require('express');
 const app = express();
+const cors = require('cors');
+app.use(cors());
+
+
 const server = require('http').createServer(app);
 const io = require('socket.io')(server);
 
@@ -30,6 +34,8 @@ wss.on('connection', ws => {
 
 
 var dbo;
+
+
 
 MongoClient.connect(url).then(function (db) {
   //converted
