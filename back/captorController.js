@@ -46,7 +46,7 @@ exports.receiveData = (req, res) => {
             //Check if alert
             let jsonLimit ={"quantity" : 50, "quality" : 5, "humidity" : 70, "temp" : 40, "irradiance" : 1000 };
             let alert =[];
-            if(parseInt(json.quantity)>parseInt(jsonLimit.quantity)){
+            if(parseInt(json.quantity)<parseInt(jsonLimit.quantity)){
                 alert.push("quantity");
             }
             if(parseInt(json.quality)>parseInt(jsonLimit.quality)){
