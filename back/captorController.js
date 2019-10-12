@@ -54,7 +54,7 @@ exports.receiveData = (req, res) => {
                         "name":result.name,
                         "lat":result.lat,
                         "long":result.long,
-                        "datatime":result.data[result.data.length-1].datetime,
+                        "datetime":result.data[result.data.length-1].datetime,
                         "level":3
 
                     };
