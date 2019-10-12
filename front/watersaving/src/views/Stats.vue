@@ -129,7 +129,7 @@ export default {
           curve: "straight"
         },
         title: {
-          text: "Quantité",
+          text: "Qualité de l'eau",
           align: "left"
         },
         grid: {
