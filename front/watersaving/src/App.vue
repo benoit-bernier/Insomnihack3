@@ -52,7 +52,7 @@
           </v-list-item-content>
         </v-list-item>
         <v-divider></v-divider>
-        <v-list-item style="margin-top:10px" @click="change_route('stats')">
+        <v-list-item style="margin-top:10px;margin-bottom:10px" @click="change_route('stats')">
           <v-list-item-action>
             <v-icon>mdi-chart-bar</v-icon>
           </v-list-item-action>
