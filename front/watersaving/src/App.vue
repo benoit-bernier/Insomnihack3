@@ -8,22 +8,21 @@
       right
     >
       <div v-if="alarms.length == 0">
-        Il n'y pas d'alames
+        <p style="margin:auto;margin-top:10px; ">Il n'y pas d'alarmes</p>
       </div>
       <v-list v-else dense>
         <v-list-item v-for="item in alarms" :key="item.id" @click="show_notif(item)">
           <v-list-item-action>
             <v-icon v-if="item.level == 1" color="yellow">mdi-alert</v-icon>
             <v-icon v-else-if="item.level == 2" color="orange">mdi-alert</v-icon>
-            <v-icon v-else-if="item.level == 3 && item.alert[0] != 'nodata'" color="red">mdi-alert</v-icon>
-            <v-icon v-else-if="item.alert[0] == 'nodata'" color="black">mdi-alert</v-icon>
+            <v-icon v-else-if="item.level == 3 && item.alert[0] != 'la connection'" color="red">mdi-alert</v-icon>
+            <v-icon v-else-if="item.alert[0] == 'la connection'" color="black">mdi-alert</v-icon>
           </v-list-item-action>
           <v-list-item-content >
-            <v-list-item-title>Nom du puits {{ item.name }}</v-list-item-title>
+            <v-list-item-title>{{ item.name }}</v-list-item-title>
             <v-list-item-title>Date: {{ item.date }}</v-list-item-title>
             <v-list-item-title>Motif: 
-              <span v-for="i in item.alert" :key="i">
-                {{ i }}
+              <span>{{item.alert[0]}}
               </span>
             </v-list-item-title>
           </v-list-item-content>
@@ -110,7 +109,7 @@
           <v-card-title class="headline">Détail site {{ current_alarm.name }} </v-card-title>
           <v-card-text>
             <v-alert type="warning">
-              Nous avons pu detecter un problème au niveau de la {{ current_alarm.alert[0] }}
+              Nous avons pu detecter un problème au niveau de {{ current_alarm.alert[0] }}
             </v-alert>
             <template>
               <v-simple-table v-if="!current_alarm.is_down">
@@ -216,13 +215,35 @@
         console.log(resp)
         this.snackbar = true,
         this.text = 'Nouvelle alerte detectée ' + resp.name;
+        let tempArrayAlert = []
+        resp.alert.forEach((elt)=>{
+          switch(elt){
+            case "quantity":
+              tempArrayAlert.push("la quantité d'eau")
+              break
+            case "quality" :
+              tempArrayAlert.push("la qualité de l'eau")
+              break
+            case "temp" :
+              tempArrayAlert.push("la température")
+              break
+            case "humidity":
+              tempArrayAlert.push("l'humidité")
+              break
+            case "irradiance":
+              tempArrayAlert.push("l'irradiance")
+              break
+            case "nodata":
+              tempArrayAlert.push("la connection")
+          }
+        })
         if(resp.alert[0] == "nodata"){
           this.alarms.push({
             'is_down': true,
             'name': resp.name,
             'level': resp.level,
             'date': resp.datetime,
-            'alert': resp.alert
+            'alert': tempArrayAlert
           })
         }else{
           this.alarms.push({
@@ -235,7 +256,7 @@
             'quantity': resp.data.quantity,
             'sensor_id': resp.data.sensor_id,
             'temp': resp.data.temp,
-            'alert': resp.alert
+            'alert': tempArrayAlert
           })
         }
       }
