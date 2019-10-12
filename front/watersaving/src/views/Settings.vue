@@ -2,7 +2,9 @@
 <template>
   <v-card style="margin:20px">
     <v-card-title>
-      Gestion des puits
+      Gestion des puits 
+      <v-btn style="margin-left:10px;color:white" @click="reset_open()" color="blue">Créer</v-btn>
+
       <div class="flex-grow-1"></div>
       <v-text-field
         v-model="search"
@@ -45,7 +47,7 @@
           <v-container>
             <v-row>
               <v-col cols="12">
-                <v-text-field label="ID référent*" v-model="well.id" required></v-text-field>
+                <v-text-field :disabled="false" label="ID référent*" v-model="well.id" required></v-text-field>
               </v-col>
               <v-col cols="12">
                 <v-text-field label="Nom*" type="text" v-model="well.name" required></v-text-field>
@@ -67,6 +69,40 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <v-dialog v-model="dialog_create" persistent max-width="600px">
+      <v-card>
+        <v-card-title>
+          <span class="headline">Création d'un puit</span>
+        </v-card-title>
+        <div style="display:block;height:4px;background-color:blue; margin-bottom:20px"></div>
+        <v-card-text>
+          <v-container>
+            <v-row>
+              <v-col cols="12">
+                <v-text-field label="ID référent*" v-model="well.id" required></v-text-field>
+              </v-col>
+              <v-col cols="12">
+                <v-text-field label="Nom*" type="text" v-model="well.name" required></v-text-field>
+              </v-col>
+              <v-col cols="6">
+                <v-text-field label="lat*" type="text" v-model="well.lat" required></v-text-field>
+              </v-col>
+              <v-col cols="6">
+                <v-text-field label="long*" type="text" v-model="well.long" required></v-text-field>
+              </v-col>
+            </v-row>
+          </v-container>
+          <small>*champs obligatoires</small>
+        </v-card-text>
+        <v-card-actions>
+          <div class="flex-grow-1"></div>
+          <v-btn color="blue darken-1" text @click="dialog_create = false">Annuler</v-btn>
+          <v-btn color="blue darken-1" text @click="create_well()">Valider</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
       <v-snackbar
       v-model="snackbar_error"
       color="red"
@@ -103,6 +139,7 @@ export default {
   data: () => ({
     dialog_delete: false,
     dialog_edit: false,
+    dialog_create: false,
     snackbar_error: false,
     snackbar_success: false,
     text_snack: "",
@@ -132,6 +169,24 @@ export default {
     this.get_all_well();
   },
   methods: {
+    reset_open(){
+      this.dialog_create = true
+    },
+    async create_well(){
+      await well_service.post_well(this.well).then(response => {
+        if(response.data.status){
+          this.text_snack = "Succès de la création du puit"
+          this.snackbar_success = true
+          setInterval(function(){this.snackbar_success = false }, 500);
+          this.items.push(this.well)
+        }else{
+          this.text_snack = "Erreur de la création du puit"
+          this.snackbar_error = true
+          setInterval(function(){this.snackbar_error = false }, 500);
+        }
+      });
+      this.dialog_create = false
+    },
     edit_well(item){
       this.well = item
       this.dialog_edit = true
