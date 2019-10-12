@@ -26,8 +26,17 @@ except:
 gateway = "ec2-3-83-159-102.compute-1.amazonaws.com:3000"
 id = 1
 
+quantity = random.randint(70,90)
+temp = random.randint(25,35)
+humidity = random.randint(40,70)
+irradiance = random.randint(800,900)
+
 while True:
 
+	quantity = abs(quantity + random.randint(-5, 3))
+	temp = abs(temp + random.randint(-2, 4))
+	humidity = abs(humidity + random.randint(-3, 5))
+	irradiance = abs(irradiance + random.randint(-20, 30))
 	qual = random.randint(1,3)
 
 	if gpio_enabled:
@@ -43,21 +52,29 @@ while True:
 		'id': id,
 		'sensor_id': 1,
 		'datetime' : datetime.now().strftime("%b %d %Y %H:%M:%S"),
-		'quantity': 50 + random.randint(-10, 10),
+		'quantity': quantity,
 		'quality': qual, # 1 = mauvaise, 2 = moyenne, 3 = bonne
-		'humidity': random.randint(50,75), # expérimée en pourcentage
-		'temp': random.randint(30, 40), # expérimée en degrés celsius
-		'irradiance': 4141
+		'humidity': humidity, # exprimée en pourcentage
+		'temp': temp, # expérimée en degrés celsius
+		'irradiance': irradiance
 	}
+
+	# alertes sur tout
+	# quantité initiale
 
 	post_data = json.dumps(data)
 	id = id + 1
 	print("[!] sending sensor data to gateway...")
 
 	try:
-		res = requests.post('http://' + gateway+'/captor/data', data=post_data).content # TODO check retour POST (200 OK)
+		res = requests.post('http://' + gateway + '/captor/data', data=post_data).content # TODO check retour POST (200 OK)
 		print(res)
 	except Exception as e:
 		print(e)
 	
-	time.sleep(10)
+	time.sleep(20)
+
+# TODO au dessus de ça, c'est une alerte
+# quantity < 50, quality 5, 
+# moyenne a peu près nulle
+# quantity en moyenne ça va diminuer pour throw une alerte*

@@ -38,7 +38,7 @@
       dark
     >
       <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
-      <v-toolbar-title>Maps</v-toolbar-title>
+      <v-toolbar-title>{{toolBarState}}</v-toolbar-title>
       <div class="flex-grow-1"></div>
        <v-badge style="margin-right:20px">
         <template v-slot:badge>{{ nb_alarms }}</template>
@@ -58,7 +58,7 @@
             <v-icon>mdi-google-maps</v-icon>
           </v-list-item-action>
           <v-list-item-content>
-            <v-list-item-title>Maps</v-list-item-title>
+            <v-list-item-title>Carte</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
         <v-divider></v-divider>
@@ -250,6 +250,9 @@
       }
     },
     computed:{
+      toolBarState() {
+        return this.$store.getters.toolbarState
+      },
       nb_alarms(){
         return this.alarms.length
       }

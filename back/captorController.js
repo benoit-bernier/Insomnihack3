@@ -1,5 +1,7 @@
 let dbo= require("./server_web.js").dbo;
 let socketTab = require("./server_web.js").socketTab;
+let timers=[]; 
+
 
 exports.receiveData = (req, res) => {
 
@@ -8,17 +10,20 @@ exports.receiveData = (req, res) => {
         body += chunk.toString();
     });
 
+
     req.on('end', () => {
         //console.log(body);
         let json = JSON.parse(body);
         //ADD DATA TO MONGODB
         var myobj = json;
         //console.log(json);
-        dbo.collection("captorData").findOne({ "id": parseInt(json.sensor_id) }, function (err, res) {
+
+        dbo.collection("captorData").findOne({ "id": parseInt(json.sensor_id) }, function (err, result) {
             let name='unknow';
+            console.log(result)
             if (err) throw err;
             //console.log(res);
-            if (res == null) {
+            if (result == null) {
                 myobj = {
                     id: parseInt(json.sensor_id),
                     lat: (Math.random() * (+30.0 - +15.0) + +15.0),
@@ -34,42 +39,68 @@ exports.receiveData = (req, res) => {
             }
             else {
                 //ToDO Update
-                name=res.name;
-                res.data.push(json);
+                name=result.name;
+                result.data.push(json);
                 //console.log(res);
                 dbo.collection("captorData").update({ "id": parseInt(json.sensor_id) }, { $push: { data: json } }, function (err, res) {
                     if (err) throw err;
-                    console.log("1 document inserted");
+                    if( timers[json.sensor_id]!=null){
+                        clearTimeout(timers[json.sensor_id]);
+                    }
+                   timers[json.sensor_id]=setTimeout(function() {
+                    let jsonAlert={
 
+                        "alert":['nodata'],
+                        "name":result.name,
+                        "lat":result.lat,
+                        "long":result.long,
+                        "datetime":result.data[result.data.length-1].datetime,
+                        "level":3
+
+                    };
+                    socketTab.forEach(function (ws) {
+                        ws.send(JSON.stringify(jsonAlert));
+                   })
+                    }, 40000, result);
+
+                    console.log("1 document inserted");
                 });
             }
+
             //Check if alert
             let jsonLimit ={"quantity" : 50, "quality" : 5, "humidity" : 70, "temp" : 40, "irradiance" : 1000 };
             let alert =[];
-            if(parseInt(json.quantity)>parseInt(jsonLimit.quantity)){
+            let level=0;
+            if(parseInt(json.quantity)<parseInt(jsonLimit.quantity)){
                 alert.push("quantity");
+                if(level<3){level=3;}
             }
-            if(parseInt(json.quality)>parseInt(jsonLimit.quality)){
+            if(parseInt(json.quality)==1){
                 alert.push("quality");
+                if(level<3){level=3;}
             }
             if(parseInt(json.humidity)>parseInt(jsonLimit.humidity)){
                 alert.push("humidity");
+                if(level<2){level=2;}
             }
             if(parseInt(json.temp)>parseInt(jsonLimit.temp)){
                 alert.push("temp");
+                if(level<1){level=1;}
             }
             if(parseInt(json.irradiance)>parseInt(jsonLimit.irradiance)){
                 alert.push("irradiance");
+                if(level<1){level=1;}
             }
-            console.log(alert);
+            //console.log(alert);
             if(alert.length>0){
                 let jsonAlert={
                     "datetime":json.datetime,
                     "alert":alert,
                     "name":name,
+                    "level":level,
                     "data":json
                 };
-                console.log(jsonAlert);
+                //console.log(jsonAlert);
                 socketTab.forEach(function (ws) {
                     ws.send(JSON.stringify(jsonAlert));
                })
