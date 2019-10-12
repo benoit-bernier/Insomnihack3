@@ -9,6 +9,8 @@ module.exports = (app) => {
     app.get("/well/data/last", well.lastData);
     app.get("/well/data/last/:id", well.lastDataById);
     app.get("/well/data/all/:id", well.allDataById);
+    app.get("/well/data/name/all", well.allDataName);
+    app.get("/well/data/nameLatLong/all", well.allDataNameLatLong);
 
     app.post("/well/create", well.create);
     app.put("/well/update", well.update);
