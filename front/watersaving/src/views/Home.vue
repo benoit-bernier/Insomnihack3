@@ -4,7 +4,6 @@
 
 <script>
 import googleMaps from "@/components/Map";
-
 export default {
   components: { googleMaps }
 };
