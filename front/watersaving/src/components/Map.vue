@@ -60,6 +60,8 @@ export default {
       if (result) {
         result.data.forEach(element => {
           if (element.data != null) {
+              element.lat = parseFloat(element.lat);
+              element.long = parseFloat(element.long);
             if (this.center.lat == 0) {
               this.center = { lat: element.lat, lng: element.long };
             }
@@ -82,8 +84,9 @@ export default {
   },
 
   methods: {
-      goToStats(Markerid){
-          this.$router.push({ name: 'stats', params: { id: Markerid } })
+      goToStats(MarkerId){
+          localStorage.setItem("propsWellId", MarkerId)
+          this.$router.push({ name: 'stats'})
       },
     addMarker(latitude, longitude) {
       const marker = {
