@@ -25,6 +25,7 @@ export default new Router({
       path: '/stats',
       name: 'stats',
       component: Stats,
+      props : true
     },
     {
       path: '/settings',

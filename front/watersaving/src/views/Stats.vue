@@ -30,39 +30,37 @@
         </v-row>
       </v-col>
     </v-row>
-    <div v-if="render">
-      <apexchart
-        v-if="is_show[0]" 
-        type="line"
-        height="300"
-        :options="chart_quantity"
-        :series="series_quantity"
-      />
-    </div>
+    <apexchart
+      v-if="is_show[0]"
+      type="line"
+      height="300"
+      :options="chart_quantity"
+      :series="series_quantity"
+    />
 
     <apexchart
-      v-if="is_show[1]" 
+      v-if="is_show[1]"
       type="line"
       height="300"
       :options="chart_quality"
       :series="series_quality"
     />
     <apexchart
-      v-if="is_show[2]" 
+      v-if="is_show[2]"
       type="line"
       height="300"
       :options="chart_temperature"
       :series="series_temperature"
     />
     <apexchart
-      v-if="is_show[3]" 
+      v-if="is_show[3]"
       type="line"
       height="300"
       :options="chart_humidity"
       :series="series_humidity"
     />
     <apexchart
-      v-if="is_show[4]" 
+      v-if="is_show[4]"
       type="line"
       height="300"
       :options="chart_irradiance"
@@ -79,8 +77,10 @@ export default {
     return {
       components: [],
       show: true,
-      render: true,
-      name_select: "",
+      name_select: {
+        name: "",
+        id: -1
+      },
       date_filter: ["1 ans", "6 mois", "1 mois", "Aujourd'hui"],
       items: ["Quantité", "Qualité", "Température", "Humidité", "Irradiance"],
       value: ["Quantité", "Qualité", "Température", "Humidité", "Irradiance"],
@@ -88,31 +88,31 @@ export default {
       series_quantity: [
         {
           name: "Quantité",
-          data: [1,1,1,1,1,1]
+          data: []
         }
       ],
       series_quality: [
         {
           name: "Qualité",
-          data: [1, 2, 3, 5, 4, 5, 2, 1, 1]
+          data: []
         }
       ],
       series_temperature: [
         {
           name: "Température",
-          data: [25, 27, 22, 30, 35, 32, 31, 26, 37]
+          data: []
         }
       ],
       series_humidity: [
         {
           name: "Humidité",
-          data: [85, 96, 79, 84, 98, 65, 69, 91, 78]
+          data: []
         }
       ],
       series_irradiance: [
         {
           name: "irradiance",
-          data: [10, 41, 35, 51, 49, 62, 69, 91, 148]
+          data: []
         }
       ],
       chart_quality: {
@@ -153,7 +153,7 @@ export default {
           enabled: false
         },
         stroke: {
-          curve: "straight",
+          curve: "straight"
         },
         title: {
           text: "Quantité en L",
@@ -180,7 +180,7 @@ export default {
           enabled: false
         },
         stroke: {
-          curve: "straight",
+          curve: "straight"
         },
         title: {
           text: "Temperature en °C",
@@ -207,7 +207,7 @@ export default {
           enabled: false
         },
         stroke: {
-          curve: "straight",
+          curve: "straight"
         },
         title: {
           text: "Humidité en %",
@@ -234,7 +234,7 @@ export default {
           enabled: false
         },
         stroke: {
-          curve: "straight",
+          curve: "straight"
         },
         title: {
           text: "Irradiance en Wm2",
@@ -253,29 +253,48 @@ export default {
     };
   },
   created() {
+    if (localStorage.getItem("propsWellId") != null) {
+      if (parseInt(localStorage.getItem("propsWellId"))) {
+        this.name_select.id = parseInt(localStorage.getItem("propsWellId"));
+        this.get_all_detail();
+        localStorage.removeItem("propsWellId");
+      }
+    }
     this.get_all_name();
   },
   methods: {
     async get_all_name() {
-      await well_service.get_all_name().then(response => {
-        this.components = response.data;
+      await well_service.get_all_name().then(resp => {
+        if (this.name_select.id != -1) {
+          resp.data.forEach(data => {
+            if (data.id == this.name_select.id) {
+              console.log("rere");
+              this.name_select.name = data.name;
+            }
+          });
+        }
+        this.components = resp.data;
       });
     },
-    async get_all_detail() {    
+    async get_all_detail() {
       await well_service.get_all_data(this.name_select.id).then(response => {
         this.series_quantity[0].data = [];
         this.series_quality[0].data = [];
         this.series_temperature[0].data = [];
         this.series_humidity[0].data = [];
         this.series_irradiance[0].data = [];
-        response.data.forEach((element, index) => {
+        response.data.forEach(element => {
           this.series_quantity[0].data.push(element.quantity);
           this.series_quality[0].data.push(element.quality);
           this.series_temperature[0].data.push(element.temp);
           this.series_humidity[0].data.push(element.humidity);
           this.series_irradiance[0].data.push(element.irradiance);
         });
-        this.show[0] = true
+        let tempValue = this.value;
+        this.value = [];
+        setTimeout(() => {
+          this.value = tempValue;
+        }, 0.0001);
       });
     }
   },
@@ -285,13 +304,12 @@ export default {
       this.items.forEach((element, index) => {
         this.is_show[index] = this.value.includes(element);
       });
-    },
-
+    }
   }
 };
 </script>
 <style>
-  .apexcharts-menu-icon{
-    display: none
-  }
+.apexcharts-menu-icon {
+  display: none;
+}
 </style>
