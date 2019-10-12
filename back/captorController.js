@@ -8,6 +8,7 @@ exports.receiveData = (req, res) => {
         body += chunk.toString();
     });
 
+
     req.on('end', () => {
         //console.log(body);
         let json = JSON.parse(body);
@@ -39,37 +40,46 @@ exports.receiveData = (req, res) => {
                 //console.log(res);
                 dbo.collection("captorData").update({ "id": parseInt(json.sensor_id) }, { $push: { data: json } }, function (err, res) {
                     if (err) throw err;
+                   
                     console.log("1 document inserted");
 
                 });
             }
+
             //Check if alert
             let jsonLimit ={"quantity" : 50, "quality" : 5, "humidity" : 70, "temp" : 40, "irradiance" : 1000 };
             let alert =[];
+            let level=0;
             if(parseInt(json.quantity)<parseInt(jsonLimit.quantity)){
                 alert.push("quantity");
+                if(level<3){level=3;}
             }
-            if(parseInt(json.quality)>parseInt(jsonLimit.quality)){
+            if(parseInt(json.quality)==1){
                 alert.push("quality");
+                if(level<3){level=3;}
             }
             if(parseInt(json.humidity)>parseInt(jsonLimit.humidity)){
                 alert.push("humidity");
+                if(level<2){level=2;}
             }
             if(parseInt(json.temp)>parseInt(jsonLimit.temp)){
                 alert.push("temp");
+                if(level<1){level=1;}
             }
             if(parseInt(json.irradiance)>parseInt(jsonLimit.irradiance)){
                 alert.push("irradiance");
+                if(level<1){level=1;}
             }
-            console.log(alert);
+            //console.log(alert);
             if(alert.length>0){
                 let jsonAlert={
                     "datetime":json.datetime,
                     "alert":alert,
                     "name":name,
+                    "level":level,
                     "data":json
                 };
-                console.log(jsonAlert);
+                //console.log(jsonAlert);
                 socketTab.forEach(function (ws) {
                     ws.send(JSON.stringify(jsonAlert));
                })
