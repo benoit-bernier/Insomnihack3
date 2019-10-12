@@ -7,15 +7,25 @@
       clipped
       right
     >
-      <v-list dense>
-        <v-list-item v-for="item in alarms" :key="item.id" @click.stop="dialog = true">
+      <div v-if="alarms.length == 0">
+        Il n'y pas d'alames
+      </div>
+      <v-list v-else dense>
+        <v-list-item v-for="item in alarms" :key="item.id" @click="show_notif(item)">
           <v-list-item-action>
-            <v-icon v-if="item.level == 0" color="yellow">mdi-alert</v-icon>
-            <v-icon v-if="item.level == 1" color="red">mdi-alert</v-icon>
+            <v-icon v-if="item.level == 1" color="yellow">mdi-alert</v-icon>
+            <v-icon v-else-if="item.level == 2" color="orange">mdi-alert</v-icon>
+            <v-icon v-else-if="item.level == 3 && item.alert[0] != 'nodata'" color="red">mdi-alert</v-icon>
+            <v-icon v-else-if="item.alert[0] == 'nodata'" color="black">mdi-alert</v-icon>
           </v-list-item-action>
           <v-list-item-content >
-            <v-list-item-title>{{ item.name }}</v-list-item-title>
+            <v-list-item-title>Nom du puits {{ item.name }}</v-list-item-title>
             <v-list-item-title>Date: {{ item.date }}</v-list-item-title>
+            <v-list-item-title>Motif: 
+              <span v-for="i in item.alert" :key="i">
+                {{ i }}
+              </span>
+            </v-list-item-title>
           </v-list-item-content>
         </v-list-item>
       </v-list>
@@ -61,6 +71,15 @@
           </v-list-item-content>
         </v-list-item>
          <v-divider></v-divider>
+         <v-list-item style="margin-top:10px;margin-bottom:10px" @click="change_route('history')">
+          <v-list-item-action>
+            <v-icon>mdi-card-bulleted</v-icon>
+          </v-list-item-action>
+          <v-list-item-content>
+            <v-list-item-title>Historique</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+         <v-divider></v-divider>
         <v-list-item style="margin-top:10px" @click="change_route('settings')">
           <v-list-item-action>
             <v-icon>mdi-settings-outline</v-icon>
@@ -88,13 +107,13 @@
         max-width="600"
       >
         <v-card>
-          <v-card-title class="headline">Détail site Lalibela </v-card-title>
+          <v-card-title class="headline">Détail site {{ current_alarm.name }} </v-card-title>
           <v-card-text>
             <v-alert type="warning">
-              Nous avons pu detecter un problème au niveau de la qualité
+              Nous avons pu detecter un problème au niveau de la {{ current_alarm.alert[0] }}
             </v-alert>
             <template>
-              <v-simple-table>
+              <v-simple-table v-if="!current_alarm.is_down">
                 <template v-slot:default>
                   <thead>
                     <tr>
@@ -108,12 +127,12 @@
                   </thead>
                   <tbody>
                     <tr>
-                      <td>2019-09-01 8h35</td>
-                      <td>512 L</td>
-                      <td>Moyenne</td>
-                      <td>90%</td>
-                      <td>18°C</td>
-                      <td>55 Wm2</td>
+                      <td>{{ current_alarm.name }}</td>
+                      <td>{{ current_alarm.quantity }}</td>
+                      <td>{{ current_alarm.quality }}</td>
+                      <td>{{ current_alarm.humidity }}</td>
+                      <td>{{ current_alarm.temp }}</td>
+                      <td>{{ current_alarm.irradiance }}</td>
                     </tr>
                   </tbody>
                 </template>
@@ -133,7 +152,22 @@
         </v-card>
       </v-dialog>
   </template>
-
+  <v-snackbar
+        style="margin-right:60px"
+        v-model="snackbar"
+        :timeout="timeout"
+        top="top"
+        right="right"
+      >
+        {{ text }}
+        <v-btn
+          color="blue"
+          text
+          @click="snackbar = false"
+        >
+          Fermer
+      </v-btn>
+    </v-snackbar>
 
     <v-footer
       app
@@ -158,24 +192,61 @@
       drawerRight: null,
       right: false,
       left: false,
-      alarms:[
-        {
-          'id': 0,
-          'level': 0,
-          'name': 'Test alarmes',
-          'date': '2019-01-01 8h35'
+      current_alarm:{
+          'name': "Alertes en Libie",
+          'level': 2,
+          'humidity': 90,
+          'irradiance': 152,
+          'quality': 1,
+          'quantity': 152,
+          'sensor_id': 15,
+          'temp': 20,
+          'date': '2019 09 03 8h35',
+          'alert': ["Humidité"]
         },
-        {
-          'id': 1,
-          'level': 1,
-          'name': 'Test alarmes',
-          'date': '2019-01-01 8h35'
-        }
-      ]
+      snackbar: false,
+      text: '',
+      timeout: 4000,
+      alarms:[]
     }),
+    created(){
+      this.$connect( 'ws://ec2-3-83-159-102.compute-1.amazonaws.com:8080/', { format: 'json' })
+      this.$options.sockets.onmessage = (ms) => {
+        var resp = JSON.parse(ms.data)
+        console.log(resp)
+        this.snackbar = true,
+        this.text = 'Nouvelle alerte detectée ' + resp.name;
+        if(resp.alert[0] == "nodata"){
+          this.alarms.push({
+            'is_down': true,
+            'name': resp.name,
+            'level': resp.level,
+            'date': resp.datetime,
+            'alert': resp.alert
+          })
+        }else{
+          this.alarms.push({
+            'name': resp.name,
+            'level': resp.level,
+            'date': resp.data.datetime,
+            'humidity': resp.data.humidity,
+            'irradiance': resp.data.irradiance,
+            'quality': resp.data.quality,
+            'quantity': resp.data.quantity,
+            'sensor_id': resp.data.sensor_id,
+            'temp': resp.data.temp,
+            'alert': resp.alert
+          })
+        }
+      }
+    },
     methods:{
       change_route(value){
        this.$router.push(value)
+      },
+      show_notif(value){
+        this.current_alarm = value
+        this.dialog = true
       }
     },
     computed:{

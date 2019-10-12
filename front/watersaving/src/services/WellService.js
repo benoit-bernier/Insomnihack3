@@ -24,6 +24,12 @@ export default {
   },
   delete_well(id){
     return Api.delete('well/delete/'+ id)
+  },
+  get_all_history(id){
+    return Api.get('well/info/all/' + id)
+  },
+  post_history(data){
+    return Api.post('well/info/add', data)
   }
 
 }

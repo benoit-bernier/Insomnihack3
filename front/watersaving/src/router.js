@@ -3,6 +3,7 @@ import Router from 'vue-router'
 import Map from '@/components/Map'
 import Stats from '@/views/Stats'
 import Settings from '@/views/Settings'
+import History from '@/views/History'
 
 Vue.use(Router)
 
@@ -25,6 +26,11 @@ export default new Router({
       path: '/stats',
       name: 'stats',
       component: Stats,
+    },
+    {
+      path: '/history',
+      name: 'history',
+      component: History,
     },
     {
       path: '/settings',
