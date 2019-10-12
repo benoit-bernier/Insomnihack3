@@ -31,7 +31,7 @@
       <v-toolbar-title>Maps</v-toolbar-title>
       <div class="flex-grow-1"></div>
        <v-badge style="margin-right:20px">
-        <template v-slot:badge>0</template>
+        <template v-slot:badge>{{ nb_alarms }}</template>
          <v-icon @click.stop="drawerRight = !drawerRight">mdi-bell</v-icon>
       </v-badge>
     </v-app-bar>
@@ -41,8 +41,9 @@
       app
     >
       <v-img style="margin-top:10px" src="./assets/logo_water.jpeg"></v-img>
+      <v-divider></v-divider>
       <v-list dense>
-        <v-list-item @click.stop="right = !right">
+        <v-list-item style="margin-bottom:10px" @click="change_route('map')">
           <v-list-item-action>
             <v-icon>mdi-google-maps</v-icon>
           </v-list-item-action>
@@ -50,7 +51,8 @@
             <v-list-item-title>Maps</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
-        <v-list-item @click.stop="right = !right">
+        <v-divider></v-divider>
+        <v-list-item style="margin-top:10px" @click="change_route('stats')">
           <v-list-item-action>
             <v-icon>mdi-chart-bar</v-icon>
           </v-list-item-action>
@@ -58,7 +60,18 @@
             <v-list-item-title>Statistiques</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
+         <v-divider></v-divider>
+        <v-list-item style="margin-top:10px" @click="change_route('settings')">
+          <v-list-item-action>
+            <v-icon>mdi-settings-outline</v-icon>
+          </v-list-item-action>
+          <v-list-item-content>
+            <v-list-item-title>Paramètres</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
       </v-list>
+      <v-divider></v-divider>
+
     </v-navigation-drawer>
 
 
@@ -110,7 +123,7 @@
           <v-card-actions>
             <div class="flex-grow-1"></div>
             <v-btn
-              color="blue darken-1"
+              color="blue darken-2"
               text
               @click="dialog = false"
             >
@@ -160,5 +173,15 @@
         }
       ]
     }),
+    methods:{
+      change_route(value){
+       this.$router.push(value)
+      }
+    },
+    computed:{
+      nb_alarms(){
+        return this.alarms.length
+      }
+    }
   }
 </script>
