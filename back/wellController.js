@@ -52,6 +52,39 @@ exports.allDataById = (req, res) => {
     });
 }
 
+exports.allDataName = (req, res) => {
+    dbo.collection("captorData").find().toArray(function (err, result) {
+        if (err) throw err;
+        console.log(result);
+        if (result != null) {
+            let tmp = [];
+            result.forEach(function(e){
+                tmp.push({"id":e.id,"name":e.name});
+            })
+            res.end(JSON.stringify(tmp));
+        }
+        else {
+            res.end();
+        }
+    });
+}
+
+exports.allDataNameLatLong = (req, res) => {
+    dbo.collection("captorData").find().toArray(function (err, result) {
+        if (err) throw err;
+        console.log(result);
+        if (result != null) {
+            let tmp = [];
+            result.forEach(function(e){
+                tmp.push({"id":e.id,"name":e.name,"lat":e.lat,"long":e.long});
+            })
+            res.end(JSON.stringify(tmp));
+        }
+        else {
+            res.end();
+        }
+    });
+}
 
 exports.create = (req, res) => {
 
