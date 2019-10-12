@@ -2,8 +2,7 @@ from flask import Flask, request  # sudo pip3 install flask
 import requests # sudo pip3 install requests
 
 app = Flask(__name__)
-host_to_fwd = "192.168.43.21:5000"
-
+host_to_fwd = "ec2-3-83-159-102.compute-1.amazonaws.com:3000"
 
 # Match all possible paths
 @app.route('/', defaults={'path': ''}, methods = ['GET', 'POST'])
@@ -20,4 +19,4 @@ def forward(path):
 	return 'forwarding done :)' # TODO check HTTP 200 OK
 
 if __name__ == "__main__":
-	app.run(host='0.0.0.0', port=5000)
+	app.run(host='0.0.0.0', port=3000)
