@@ -28,16 +28,16 @@ id = 1
 
 while True:
 
+	qual = random.randint(1,3)
+
 	if gpio_enabled:
 		green_led.off()
 		red_led.off() 
 
-	qual = random.randint(1,3)
-
-	if qual == 1: # eau de mauvaise qualité, on allume la LED rouge
-		red_led.on()
-	if qual == 3: # eau de bonne qualité, on allume la LED verte
-		green_led.on()
+		if qual == 1: # eau de mauvaise qualité, on allume la LED rouge
+			red_led.on()
+		if qual == 3: # eau de bonne qualité, on allume la LED verte
+			green_led.on()
 
 	data = {
 		'id': id,
