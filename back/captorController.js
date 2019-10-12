@@ -42,9 +42,9 @@ exports.receiveData = (req, res) => {
 
 
         //SEND DATA TO WS
-        socketTab.forEach(function (ws) {
-            ws.send(body);
-        })
+       // socketTab.forEach(function (ws) {
+            //ws.send(body);
+       // })
         res.end();
     });
 }

@@ -1,4 +1,4 @@
-let dbo= require("./server_web.js").dbo;
+let dbo = require("./server_web.js").dbo;
 
 exports.lastData = (req, res) => {
 
@@ -58,8 +58,8 @@ exports.allDataName = (req, res) => {
         console.log(result);
         if (result != null) {
             let tmp = [];
-            result.forEach(function(e){
-                tmp.push({"id":e.id,"name":e.name});
+            result.forEach(function (e) {
+                tmp.push({ "id": e.id, "name": e.name });
             })
             res.end(JSON.stringify(tmp));
         }
@@ -72,11 +72,10 @@ exports.allDataName = (req, res) => {
 exports.allDataNameLatLong = (req, res) => {
     dbo.collection("captorData").find().toArray(function (err, result) {
         if (err) throw err;
-        console.log(result);
         if (result != null) {
             let tmp = [];
-            result.forEach(function(e){
-                tmp.push({"id":e.id,"name":e.name,"lat":e.lat,"long":e.long});
+            result.forEach(function (e) {
+                tmp.push({ "id": e.id, "name": e.name, "lat": e.lat, "long": e.long });
             })
             res.end(JSON.stringify(tmp));
         }
@@ -165,3 +164,54 @@ exports.delete = (req, res) => {
         }
     });
 }
+
+
+
+exports.addInfo = (req, res) => {
+
+    let body = '';
+    req.on('data', chunk => {
+        body += chunk.toString();
+    });
+
+    req.on('end', () => {
+        console.log(body);
+        let json = JSON.parse(body);
+
+
+        dbo.collection("captorData").findOne({ "id": parseInt(json.id) }, function (err, result) {
+            if (err) throw err;
+            console.log(result);
+            if (result != null) {
+                myobj = {
+                    nbrHabitant: json.nbrHabitant,
+                    nbrChildren: json.nbrChildren,
+                    datetime,
+                    notes: []
+                }
+                dbo.collection("captorData").updateOne({ "id": parseInt(json.id) }, { $push: { notes: myobj } }, function (err, result) {
+                    if (err) throw err;
+                    res.end(JSON.stringify({ status: true }));
+                });
+            }
+            else {
+                //ToDO Update
+                res.end(JSON.stringify({ status: false }));
+            }
+        });
+    });
+}
+
+
+exports.allInfoNoteById = (req, res) => {
+    dbo.collection("captorData").findOne({ "id": parseInt(req.params.id) },function (err, result) {
+        if (err) throw err;
+        if (result != null) {
+   
+            res.end(JSON.stringify(result.info));
+        }
+        else {
+            res.end();
+        }
+    });
+};
