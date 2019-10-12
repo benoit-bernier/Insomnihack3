@@ -2,7 +2,7 @@
 <template>
   <v-card style="margin:20px">
     <v-card-title>
-      Gestions des puits
+      Gestion des puits
       <div class="flex-grow-1"></div>
       <v-text-field
         v-model="search"
@@ -26,7 +26,7 @@
         <v-card-title class="headline">Suppression d'un puit</v-card-title>
         <div style="display:block;height:4px;background-color:red; margin-bottom:20px"></div>
 
-        <v-card-text>Etes-vous sur de vouloir supprimer ce puit ?</v-card-text>
+        <v-card-text>Etes-vous sûr de vouloir supprimer ce puit ?</v-card-text>
         <v-card-actions style="margin-top:-10px">
           <div class="flex-grow-1"></div>
           <v-btn color="blue darken-1" text @click="dialog_delete = false">Annuler</v-btn>
