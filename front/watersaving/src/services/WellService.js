@@ -10,6 +10,12 @@ export default {
   get_all_data(id){
     return Api.get('/well/data/all/' + id)
   },
+  get_all_name(){
+    return Api.get('/well/data/name/all')
+  },
+  get_all_detail(){
+    return Api.get('/well/data/nameLatLong/all')
+  },
   post_well(data){
     return Api.post('/well/create', data)
   },
@@ -17,7 +23,7 @@ export default {
     return Api.put('well/update', data)
   },
   delete_well(id){
-    return Api.put('well/delete/'+ id)
+    return Api.delete('well/delete/'+ id)
   }
 
 }

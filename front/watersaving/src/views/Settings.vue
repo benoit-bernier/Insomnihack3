@@ -1,6 +1,6 @@
   
 <template>
-   <v-card style="margin:20px">
+  <v-card style="margin:20px">
     <v-card-title>
       Gestions des puits
       <div class="flex-grow-1"></div>
@@ -12,83 +12,49 @@
         hide-details
       ></v-text-field>
     </v-card-title>
-    <v-data-table
-    :headers="headers" :items="items" :search="search" 
-    class="elevation-1"
-  >
-    <template v-slot:item.action="{ item }">
-      <v-icon
-        small
-        class="mr-2"
-        @click="dialog_edit = true"
-      >
-        mdi-pencil
-      </v-icon>
-      <v-icon
-        small
-        @click="dialog_delete=true"
-      >
-        mdi-delete
-      </v-icon>
-    </template>
-    <template v-slot:no-data>
-      <v-btn color="primary" @click="initialize">Reset</v-btn>
-    </template>
-  </v-data-table>
-   <v-dialog
-      v-model="dialog_delete"
-      max-width="350"
-    >
+    <v-data-table :headers="headers" :items="items" :search="search" class="elevation-1">
+      <template v-slot:item.action="{ item }">
+        <v-icon class="mr-2" @click="edit_well(item)">mdi-pencil</v-icon>
+        <v-icon  style="margin-left:10px" @click="delete_b_well(item)">mdi-delete</v-icon>
+      </template>
+      <template v-slot:no-data>
+        <v-btn color="primary" >Reset</v-btn>
+      </template>
+    </v-data-table>
+    <v-dialog v-model="dialog_delete" max-width="350">
       <v-card>
         <v-card-title class="headline">Suppression d'un puit</v-card-title>
         <div style="display:block;height:4px;background-color:red; margin-bottom:20px"></div>
 
-        <v-card-text>
-          Etes-vous sur de vouloir supprimer ce puit ?
-        </v-card-text>
-
+        <v-card-text>Etes-vous sur de vouloir supprimer ce puit ?</v-card-text>
         <v-card-actions style="margin-top:-10px">
           <div class="flex-grow-1"></div>
-          <v-btn
-            color="blue darken-1"
-            text
-            @click="dialog_delete = false"
-          >
-            Annuler
-          </v-btn>
-          <v-btn
-            color="blue darken-1"
-            text
-            @click="dialog_delete = false"
-          >
-            Valider
-          </v-btn>
+          <v-btn color="blue darken-1" text @click="dialog_delete = false">Annuler</v-btn>
+          <v-btn color="blue darken-1" text @click="delete_well()">Valider</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
 
-
-     <v-dialog v-model="dialog_edit" persistent max-width="600px">
-
+    <v-dialog v-model="dialog_edit" persistent max-width="600px">
       <v-card>
         <v-card-title>
           <span class="headline">Edition d'un puit</span>
         </v-card-title>
-          <div style="display:block;height:4px;background-color:green; margin-bottom:20px"></div>
+        <div style="display:block;height:4px;background-color:green; margin-bottom:20px"></div>
         <v-card-text>
           <v-container>
             <v-row>
               <v-col cols="12">
-                <v-text-field label="ID référent*" :value="well.id" required></v-text-field>
+                <v-text-field label="ID référent*" v-model="well.id" required></v-text-field>
               </v-col>
               <v-col cols="12">
-                <v-text-field label="Nom*" type="text" :value="well.name" required></v-text-field>
+                <v-text-field label="Nom*" type="text" v-model="well.name" required></v-text-field>
               </v-col>
               <v-col cols="6">
-                <v-text-field label="Latitude*" type="text" :value="well.latitude" required></v-text-field>
+                <v-text-field label="lat*" type="text" v-model="well.lat" required></v-text-field>
               </v-col>
               <v-col cols="6">
-                <v-text-field label="Longitude*" type="text" :value="well.longitude" required></v-text-field>
+                <v-text-field label="long*" type="text" v-model="well.long" required></v-text-field>
               </v-col>
             </v-row>
           </v-container>
@@ -97,84 +63,131 @@
         <v-card-actions>
           <div class="flex-grow-1"></div>
           <v-btn color="blue darken-1" text @click="dialog_edit = false">Annuler</v-btn>
-          <v-btn color="blue darken-1" text @click="dialog_edit = false">Valider</v-btn>
+          <v-btn color="blue darken-1" text @click="update_well()">Valider</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
-
-
+      <v-snackbar
+      v-model="snackbar_error"
+      color="red"
+    >
+      {{ text_snack }}
+      <v-btn
+        color="white"
+        text
+        @click="snackbar = false"
+      >
+        Close
+      </v-btn>
+    </v-snackbar>
+    <v-snackbar
+      v-model="snackbar_success"
+      color="green"
+    >
+      {{ text_snack }}
+      <v-btn
+        color="white"
+        text
+        @click="snackbar = false"
+      >
+        Close
+      </v-btn>
+    </v-snackbar>
   </v-card>
-
-
-  
 </template>
 
 <script>
-  export default {
-  
-    data: () => ({
-      dialog_delete: false,
-      dialog_edit: false,
-      well:{
-        'id': '',
-        'name': '',
-        'latitude': '',
-        'longitude': '',
-      },
-      search: '',
-        headers: [
-          {
-            text: 'Noms',
-            align: 'left',
-            sortable: false,
-            value: 'name',
-          },
-          { text: 'Latitude', value: 'latitude' },
-          { text: 'Longitude', value: 'longitude' },
-          { text: 'Actions', value: 'action', sortable: false }
-        ],
-        items: [
-          {
-            id: 124,
-            name: 'Gingerbread',
-            longitude: 356,
-            latitude: 16.0,
-          },
-          {
-            id: 145,
-            name: 'Jelly bean',
-            longitude: 375,
-            latitude: 0.0,
-          },
-          {
-            id: 14,
-            name: 'Lollipop',
-            longitude: 392,
-            latitude: 0.2,
-          },
-          {
-            id: 12,
-            name: 'Honeycomb',
-            longitude: 408,
-            latitude: 3.2,
-          },
-          {
-            id: 4,
-            name: 'Donut',
-            longitude: 452,
-            latitude: 25.0,
-          },
-          {
-            id: 2,
-            name: 'KitKat',
-            longitude: 518,
-            latitude: 26.0,
-          },
-        ],
-      
-    }),
-    methods:{
+import well_service from "@/services/WellService";
 
+export default {
+  data: () => ({
+    dialog_delete: false,
+    dialog_edit: false,
+    snackbar_error: false,
+    snackbar_success: false,
+    text_snack: "",
+    well: {
+      id: "",
+      name: "",
+      lat: "",
+      long: "",
+    },
+    search: "",
+    headers: [
+      { text: "ID Référent", value: "id" },
+      {
+        text: "Noms",
+        align: "left",
+        sortable: false,
+        value: "name"
+      },
+      { text: "Latitude", value: "lat" },
+      { text: "Longitude", value: "long" },
+      { text: "Actions", value: "action", sortable: false }
+    ],
+    items: []
+  }),
+  created() {
+    this.get_all_well();
+  },
+  methods: {
+    edit_well(item){
+      this.well = item
+      this.dialog_edit = true
+    },
+    delete_b_well(item){
+      this.well = item
+      this.dialog_delete=true
+    },
+    async get_all_well() {
+      await well_service.get_all_detail().then(response => {
+        response.data.forEach(element => {
+          this.items.push({
+            'name': element.name,
+            'id': element.id,
+            'lat': element.lat,
+            'long': element.long
+          })  
+        });
+      });
+    },
+    async update_well() {
+      await well_service.put_well(this.well).then(response => {
+        if(response.data.status){
+          this.text_snack = "Succès de la modification du puit"
+          this.snackbar_success = true
+          setInterval(function(){this.snackbar_success = false }, 500);
+        }else{
+          this.text_snack = "Erreur de la modification du puit"
+          this.snackbar_error = true
+          setInterval(function(){this.snackbar_error = false }, 500);
+        }
+      });
+      this.dialog_edit = false
+
+    },
+    async delete_well() {
+      await well_service.delete_well(this.well.id).then(response => {
+        if(response.data.status){
+          let tamp = []
+          this.items.forEach(element =>{
+            if(element.id != this.well.id){
+              tamp.push(element)
+            }
+          })
+          this.items = tamp
+          this.text_snack = "Succès de la suppression du puit"
+          this.snackbar_success = true
+          setInterval(function(){this.snackbar_success = false }, 500);
+        }else{
+          this.text_snack = "Erreur de la suppression du puit"
+          this.snackbar_error = true
+          setInterval(function(){this.snackbar_error = false }, 500);
+        }
+        this.dialog_delete = false
+
+      });
     }
   }
+};
 </script>
