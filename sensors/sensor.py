@@ -23,7 +23,7 @@ try:
 except:
 	print("[-] not runnning on an embedded device... disabling GPIO support !")
 
-gateway = "192.168.43.230:3000"
+gateway = "ec2-3-83-159-102.compute-1.amazonaws.com:3000"
 id = 1
 
 while True:
@@ -60,4 +60,4 @@ while True:
 	except Exception as e:
 		print(e)
 	
-	time.sleep(30)
+	time.sleep(10)
