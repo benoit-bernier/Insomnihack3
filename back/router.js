@@ -12,6 +12,10 @@ module.exports = (app) => {
     app.get("/well/data/name/all", well.allDataName);
     app.get("/well/data/nameLatLong/all", well.allDataNameLatLong);
 
+    app.post("/well/info/add", well.addInfo);
+
+    app.get("/well/info/all/:id", well.allInfoNoteById);
+
     app.post("/well/create", well.create);
     app.put("/well/update", well.update);
     app.delete("/well/delete/:id", well.delete);

@@ -1,5 +1,5 @@
 <template>
-  <gmap-map :center="center" :zoom="12">
+  <gmap-map :center="center" :zoom="5">
     <gmap-marker
       :key="index"
       v-for="(m, index) in markers"
@@ -11,75 +11,80 @@
       :opened="infoWindowOpen"
       :position="selectedMarker.position"
       @closeclick="infoWindowOpen = false"
-    >Date : {{selectedMarker.Date}}<br>
-    Quantité : {{selectedMarker.Quantité}}<br>
-    Qualité : {{selectedMarker.Qualité}}<br>
-    Humidité : {{selectedMarker.Humidité}}<br>
-    Température : {{selectedMarker.Température}}<br>
-    Irradiance : {{selectedMarker.Irradiance}}<br></gmap-info-window>
+    >
+      Nom : {{selectedMarker.name}}
+      <br />
+      Date : {{selectedMarker.datetime}}
+      <br />
+      Quantité : {{selectedMarker.quantity}}L
+      <br />
+      Qualité : {{selectedMarker.quality}}
+      <br />
+      Humidité : {{selectedMarker.humidity}}
+      <br />
+      Température : {{selectedMarker.temp}}
+      <br />
+      Irradiance : {{selectedMarker.irradiance}}
+      <br/>
+      <br/>
+      <v-btn color="success" title="Plus de détails" @click="goToStats(selectedMarker.id)">Plus de détails</v-btn>
+    </gmap-info-window>
   </gmap-map>
 </template>
 
 <script>
+import wellService from "@/services/WellService";
 export default {
   name: "GoogleMap",
   data() {
     return {
       infoWindowOpen: false,
       selectedMarker: {
-        position: { lat: 45.508, lng: -65.587 },
-        Date: "2019-09-01 8h35",
-        Quantité: "512 L",
-        Qualité: "Moyenne",
-        Humidité: "90%",
-        Température: "18°C",
-        Irradiance: "5 Wm2"
+        id: 0,
+        position: { lat: 0, lng: 0 },
+        name: "",
+        datetime: "",
+        quantity: "",
+        quality: "",
+        huidity: "",
+        temp: "",
+        irradiance: ""
       },
-      center: { lat: 45.508, lng: -65.587 },
-      markers: [
-        {
-          position: { lat: 45.508, lng: -65.587 },
-          Date: "2019-09-01 8h35",
-          Quantité: "512 L",
-          Qualité: "Moyenne",
-          Humidité: "90%",
-          Température: "18°C",
-          Irradiance: "5 Wm2"
-        },
-        {
-          position: { lat: 45.508, lng: -30.587 },
-          Date: "2019-09-01 8h35",
-          Quantité: "512 L",
-          Qualité: "Moyenne",
-          Humidité: "90%",
-          Température: "18°C",
-          Irradiance: "5 Wm2"
-        },
-        {
-          position: { lat: 45.508, lng: -20.587 },
-          Date: "2019-09-01 8h35",
-          Quantité: "512 L",
-          Qualité: "Moyenne",
-          Humidité: "90%",
-          Température: "18°C",
-          Irradiance: "5 Wm2"
-        },
-        {
-          position: { lat: 45.508, lng: -10.587 },
-          Date: "2019-09-01 8h35",
-          Quantité: "512 L",
-          Qualité: "Moyenne",
-          Humidité: "90%",
-          Température: "18°C",
-          Irradiance: "5 Wm2"
-        }
-      ]
+      center: { lat: 0, lng: 0 },
+      markers: []
     };
   },
 
-  mounted() {},
+  mounted() {
+    wellService.get_all_last().then(result => {
+      if (result) {
+        result.data.forEach(element => {
+          if (element.data != null) {
+            if (this.center.lat == 0) {
+              this.center = { lat: element.lat, lng: element.long };
+            }
+
+            this.markers.push({
+              position: { lat: element.lat, lng: element.long },
+              id: element.id,
+              name: element.name,
+              datetime: element.data.datetime,
+              quantity: element.data.quantity,
+              quality: element.data.quality,
+              humidity: element.data.humidity,
+              temp: element.data.temp,
+              irradiance: element.data.irradiance
+            });
+          }
+        });
+      }
+    });
+  },
 
   methods: {
+      goToStats(Markerid){
+          this.$router.push({ name: 'stats', params: { id: Markerid } })
+      },
     addMarker(latitude, longitude) {
       const marker = {
         lat: latitude,
