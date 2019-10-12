@@ -1,5 +1,5 @@
 <template>
-  <gmap-map :center="center" :zoom="5">
+  <gmap-map :center="center" :zoom="7">
     <gmap-marker
       :key="index"
       v-for="(m, index) in markers"
@@ -54,7 +54,9 @@ export default {
       markers: []
     };
   },
-
+    created() {
+    this.$store.dispatch("changeToolbarState", "Carte")
+    },
   mounted() {
     wellService.get_all_last().then(result => {
       if (result) {
