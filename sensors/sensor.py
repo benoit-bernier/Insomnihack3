@@ -8,10 +8,18 @@ gpio_enabled = False
 
 try:
 	from gpiozero import LED
+	import atexit # extinction des LEDs à la fin du script
 	green_led = LED(2)
 	red_led = LED(3)
 
 	gpio_enabled = True
+
+	def exit_handler():
+		green_led.off()
+		red_led.off()
+
+	atexit.register(exit_handler)
+
 except:
 	print("[-] not runnning on an embedded device... disabling GPIO support !")
 
