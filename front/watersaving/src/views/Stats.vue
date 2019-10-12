@@ -81,7 +81,7 @@ export default {
         name: "",
         id: -1
       },
-      date_filter: ["1 ans", "6 mois", "1 mois", "Aujourd'hui"],
+      date_filter: ["1 an", "6 mois", "1 mois", "Aujourd'hui"],
       items: ["Quantité", "Qualité", "Température", "Humidité", "Irradiance"],
       value: ["Quantité", "Qualité", "Température", "Humidité", "Irradiance"],
       is_show: [true, true, true, true, true],
@@ -156,7 +156,7 @@ export default {
           curve: "straight"
         },
         title: {
-          text: "Quantité en L",
+          text: "Quantité en litres",
           align: "left"
         },
         grid: {
@@ -183,7 +183,7 @@ export default {
           curve: "straight"
         },
         title: {
-          text: "Temperature en °C",
+          text: "Température en °C",
           align: "left"
         },
         grid: {
@@ -237,7 +237,7 @@ export default {
           curve: "straight"
         },
         title: {
-          text: "Irradiance en Wm2",
+          text: "Irradiance en W/m²",
           align: "left"
         },
         grid: {
