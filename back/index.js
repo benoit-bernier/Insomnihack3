@@ -1,8 +1,8 @@
 const express = require('express');
 const app = express();
+const mongoose = require('mongoose');
 const cors = require('cors');
-app.use(cors());
-
+const bodyParser = require('body-parser');
 
 const server = require('http').createServer(app);
 const io = require('socket.io')(server);
@@ -10,10 +10,27 @@ const io = require('socket.io')(server);
 const WebSocket = require('ws');
 const router = require('./router');
 
-const MongoClient = require('mongodb').MongoClient;
-const url = "mongodb://localhost:27017/";
+app.use(bodyParser.json()); // parse application/json
+app.use(cors());
+app.use(express.static('static'));
 
-const wss = new WebSocket.Server({ port: 8080 })
+var db = require('./config/config');
+console.log('dburl : '+db.url)
+mongoose.connect(db.url,{ useNewUrlParser: true }); 
+
+mongoose.connection.on('connected', () => {
+   console.log('MongoDB connected');
+});
+
+mongoose.connection.on('error', (err) => {
+   console.log('MongoDB connection error : ' + err);
+});
+
+mongoose.connection.on('disconnected', () => {
+   console.log('MongoDB connection close')
+});
+
+const wss = new WebSocket.Server({ port: process.env.SERVER_PORT })
 
 let socketTab = [];
 
@@ -36,34 +53,9 @@ wss.on('connection', ws => {
   })
 })
 
-
-var dbo;
-
-
-
-MongoClient.connect(url).then(function (db) {
-  //converted
-  dbo = db.db("watersaving");
-  exports.dbo=dbo;
-  var collectionName = "captorData"
-  dbo.createCollection(collectionName).then(function () {
-    console.log(collectionName + " collection created!");
-    router(app);
-  }).catch(function (err) {//failure callback
-    console.log(err)
-  });
-}).catch(function (err) { })
-
-
-
-
 server.listen(3000, function () {
   console.log('server listening on port 3000');
 });
-
-
-
-
 
 io.on('connection', function (client) {
   console.log('Client connected...');
