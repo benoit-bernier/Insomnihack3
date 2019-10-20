@@ -1,28 +1,21 @@
-let dbo= require("./server_web.js").dbo;
-let socketTab = require("./server_web.js").socketTab;
+
+const WellModel = require('../models/well');
 let timers=[]; 
 
+var socketTab = require('../shared-sockets');
 
 exports.receiveData = (req, res) => {
-
     let body = '';
     req.on('data', chunk => {
         body += chunk.toString();
     });
 
-
     req.on('end', () => {
-        //console.log(body);
         let json = JSON.parse(body);
-        //ADD DATA TO MONGODB
-        var myobj = json;
-        //console.log(json);
-
-        dbo.collection("captorData").findOne({ "id": parseInt(json.sensor_id) }, function (err, result) {
+        let myobj = json;
+        console.log(json)
+        WellModel.findOne({"id":  parseInt(json.sensor_id)}, (err, result) => {
             let name='unknow';
-            console.log(result)
-            if (err) throw err;
-            //console.log(res);
             if (result == null) {
                 myobj = {
                     id: parseInt(json.sensor_id),
@@ -31,19 +24,17 @@ exports.receiveData = (req, res) => {
                     name: 'unknow',
                     data: [json]
                 }
-                //console.log(myobj);
-                dbo.collection("captorData").insertOne(myobj, function (err, res) {
-                    if (err) throw err;
-                    console.log("1 document inserted");
-                });
+                WellModel.create(myobj, (err, result) => {
+                    if (err) console.log("error while adding new entry on receiveData")
+                    console.log("1 document inserted with create");
+                })
             }
             else {
-                //ToDO Update
                 name=result.name;
                 result.data.push(json);
-                //console.log(res);
-                dbo.collection("captorData").update({ "id": parseInt(json.sensor_id) }, { $push: { data: json } }, function (err, res) {
-                    if (err) throw err;
+
+                WellModel.update({"id": parseInt(json.sensor_id)}, { $push: { data: json } }, function (err, res) {
+                    if (err) console.log(err);
                     if( timers[json.sensor_id]!=null){
                         clearTimeout(timers[json.sensor_id]);
                     }
@@ -63,7 +54,7 @@ exports.receiveData = (req, res) => {
                    })
                     }, 40000, result);
 
-                    console.log("1 document inserted");
+                    console.log("1 document inserted with update");
                 });
             }
 
@@ -91,7 +82,6 @@ exports.receiveData = (req, res) => {
                 alert.push("irradiance");
                 if(level<1){level=1;}
             }
-            //console.log(alert);
             if(alert.length>0){
                 let jsonAlert={
                     "datetime":json.datetime,
@@ -100,13 +90,11 @@ exports.receiveData = (req, res) => {
                     "level":level,
                     "data":json
                 };
-                //console.log(jsonAlert);
                 socketTab.forEach(function (ws) {
                     ws.send(JSON.stringify(jsonAlert));
                })
             }
         });
-       
         res.end();
     });
 }

@@ -9,6 +9,7 @@ const io = require('socket.io')(server);
 
 const WebSocket = require('ws');
 const router = require('./router');
+var socketTab = require('./shared-sockets');
 
 app.use(bodyParser.json()); // parse application/json
 app.use(cors());
@@ -32,13 +33,12 @@ mongoose.connection.on('disconnected', () => {
 
 const wss = new WebSocket.Server({ port: process.env.SERVER_PORT })
 
-let socketTab = [];
+router(app);
 
 wss.on('connection', ws => {
   console.log('Connected');
   socketTab.push(ws);
   exports.socketTab=socketTab;
-  router(app);
   ws.on('message', message => {
     console.log(`Received message => ${message}`)
   })
@@ -49,7 +49,6 @@ wss.on('connection', ws => {
     console.log("Disconnected");
     socketTab.splice(socketTab.findIndex(function (e) { e == ws }));
     exports.socketTab=socketTab;
-    router(app);
   })
 })
 

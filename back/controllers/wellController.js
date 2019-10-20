@@ -5,8 +5,8 @@ exports.lastData = (req, res) => {
         if (err) return console.log(err);
         if (results) {
             results.forEach((elt, index) => {
-                this[index].data = elt.data[elt.data.length - 1];
-            }, results);
+                results[index].data = elt.data[elt.data.length - 1];
+            });
             res.send(results);
         } else {
             res.end();
@@ -41,7 +41,6 @@ exports.allDataById = (req, res) => {
             res.end();
         }
     });
-    console.log(req.params.id);
 }
 
 exports.allDataName = (req, res) => {
@@ -81,18 +80,8 @@ exports.allDataNameLatLong = (req, res) => {
 }
 
 exports.create = (req, res) => {
-
-    let body = '';
-    req.on('data', chunk => {
-        body += chunk.toString();
-    });
-
-    req.on('end', () => {
-        console.log(body);
-        let json = JSON.parse(body);
-
         WellModel.findOne({
-                "id": parseInt(json.id)
+                "id": parseInt(req.body.id)
             },
             (err, result) => {
                 if (err) return res.status(409).send({
@@ -103,10 +92,10 @@ exports.create = (req, res) => {
                 });
                 else {
                     entry = {
-                        id: parseInt(json.id),
-                        lat: json.lat,
-                        long: json.long,
-                        name: json.name,
+                        id: parseInt(req.body.id),
+                        lat: req.body.lat,
+                        long: req.body.long,
+                        name: req.body.name,
                         data: []
                     };
                     WellModel.create(entry, (err, result) => {
@@ -119,35 +108,22 @@ exports.create = (req, res) => {
                     })
                 }
             });
-    });
 }
 
 exports.update = (req, res) => {
-
-    let body = '';
-    req.on('data', chunk => {
-        body += chunk.toString();
-    });
-
-    req.on('end', () => {
-        console.log(body);
-        let json = JSON.parse(body);
-        console.log(json);
-
         WellModel.findOne({
-                "id": parseInt(json.id)
+                "id": req.body.id
             },
             (err, result) => {
                 if (err) return res.end({
                     status: false
                 });
                 if (result) {
-                    BuildingModel.update({
-                        "_id": id
-                    }, json, (err, result) => {
+                    WellModel.update({
+                        "id": req.body.id
+                    }, req.body, (err, result) => {
                         if (err) return res.status(409).send({
-                            success: false,
-                            errorMessage: ""
+                            status: false
                         });
                         return res.status(202).send({
                             status: true
@@ -159,7 +135,6 @@ exports.update = (req, res) => {
                     }));
                 }
             });
-    });
 }
 
 exports.delete = (req, res) => {
@@ -168,8 +143,6 @@ exports.delete = (req, res) => {
         return res.send({status:true});
     });
 }
-
-
 
 exports.addInfo = (req, res) => {
 res.end();
