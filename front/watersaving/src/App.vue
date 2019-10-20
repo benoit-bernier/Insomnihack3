@@ -209,7 +209,7 @@
       alarms:[]
     }),
     created(){
-      this.$connect( 'ws://ec2-3-83-159-102.compute-1.amazonaws.com:8080/', { format: 'json' })
+      this.$connect( 'ws://192.168.0.32:8080/', { format: 'json' })
       this.$options.sockets.onmessage = (ms) => {
         var resp = JSON.parse(ms.data)
         console.log(resp)

@@ -140,9 +140,10 @@ export default {
       });
     },
     async get_all_detail() {    
-      await well_service.get_all_history(this.name_select.id).then(response => {
+     /* await well_service.get_all_history(this.name_select.id).then(response => {
 
       });
+      */
     }
   }
 };

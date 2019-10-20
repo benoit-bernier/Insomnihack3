@@ -283,7 +283,7 @@ export default {
         this.series_temperature[0].data = [];
         this.series_humidity[0].data = [];
         this.series_irradiance[0].data = [];
-        response.data.forEach(element => {
+        response.data.data.forEach(element => {
           this.series_quantity[0].data.push(element.quantity);
           this.series_quality[0].data.push(element.quality);
           this.series_temperature[0].data.push(element.temp);
