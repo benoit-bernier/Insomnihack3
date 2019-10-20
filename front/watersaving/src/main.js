@@ -26,7 +26,7 @@ Vue.use(VueGoogleMaps, {
   }
 })
 
-Vue.use(VueNativeSock, 'ws://ec2-3-83-159-102.compute-1.amazonaws.com:8080/', {
+Vue.use(VueNativeSock, 'ws://192.168.0.32:8080/', {
   connectManually: true,
 })
 

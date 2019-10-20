@@ -72,12 +72,12 @@ export default {
               position: { lat: element.lat, lng: element.long },
               id: element.id,
               name: element.name,
-              datetime: element.data.datetime,
-              quantity: element.data.quantity,
-              quality: element.data.quality,
-              humidity: element.data.humidity,
-              temp: element.data.temp,
-              irradiance: element.data.irradiance
+              datetime: element.data[0].datetime,
+              quantity: element.data[0].quantity,
+              quality: element.data[0].quality,
+              humidity: element.data[0].humidity,
+              temp: element.data[0].temp,
+              irradiance: element.data[0].irradiance
             });
           }
         });

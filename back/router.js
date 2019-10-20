@@ -20,5 +20,5 @@ module.exports = (app) => {
     app.put("/well/update", well.update);
     app.delete("/well/delete/:id", well.delete);
 
-    app.post("/captor/data", sensor.receiveData);
+    app.post("/sensor/data", sensor.receiveData);
 }
