@@ -3,9 +3,9 @@
     <v-layout row wrap justify-center>
       <v-flex xs12 sm5 class="lighten-4">
         <v-container style="position: relative;top: 13%;" class="text-xs-center">
-          <v-card ma-4>
+          <v-card>
             <v-layout row justify-center>
-              <v-flex xs10 mb-4>
+              <v-flex xs10 ma-4>
                 <div v-if="!isAuth">
                   <h3 class="headline mb-0">Connexion</h3>
                   <v-form>

@@ -32,9 +32,16 @@
       <v-app-bar-nav-icon @click.stop="drawer = !drawer" v-if="isAuth"></v-app-bar-nav-icon>
       <v-toolbar-title v-if="isAuth">{{toolBarState}}</v-toolbar-title>
       <div class="flex-grow-1"></div>
-      <v-btn icon v-if="isAuth">
-        <v-icon @click="logout()">mdi-logout</v-icon>
-      </v-btn>
+
+      <v-tooltip bottom>
+        <template v-slot:activator="{ on }">
+          <v-btn icon v-on="on" v-if="isAuth">
+            <v-icon @click="logout()">mdi-logout</v-icon>
+          </v-btn>
+        </template>
+        <span>Déconnexion</span>
+      </v-tooltip>
+
       <v-badge style="margin-right:20px" v-if="isAuth">
         <template v-slot:badge>{{ nb_alarms }}</template>
         <v-icon @click.stop="drawerRight = !drawerRight">mdi-bell</v-icon>
@@ -184,24 +191,23 @@ export default {
     }
   },
   methods: {
-    logout(){
-        this.$store.dispatch('logout')
-        .then(() => {
-          this.$router.push('/')
-        })
+    logout() {
+      this.$store.dispatch("logout").then(() => {
+        this.$router.push("/");
+      });
     },
-    connectAndListenWS(){
-      console.log("connectAndListenWS")
+    connectAndListenWS() {
+      console.log("connectAndListenWS");
       if (this.isAuth) {
         this.$connect("ws://localhost:3001/", { format: "json" });
         this.$socket.onopen = () => {
-        this.$socket.sendObj({ token: this.$store.getters.AccessToken }); //send the jwt
+          this.$socket.sendObj({ token: this.$store.getters.AccessToken }); //send the jwt
         };
         this.$options.sockets.onmessage = ms => {
           var resp = JSON.parse(ms.data);
           console.log(resp);
           (this.snackbar = true),
-          (this.text = "Nouvelle alerte detectée " + resp.name);
+            (this.text = "Nouvelle alerte detectée " + resp.name);
           let tempArrayAlert = [];
           resp.alert.forEach(elt => {
             switch (elt) {
