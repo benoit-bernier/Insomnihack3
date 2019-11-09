@@ -132,6 +132,7 @@ export default {
   },
   created() {
     this.get_all_name();
+    this.$store.dispatch("changeToolbarState", "Historique")
   },
   methods: {
     async get_all_name() {
