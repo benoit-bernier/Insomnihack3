@@ -1,14 +1,21 @@
 import Vue from 'vue'
 import App from './App.vue'
 import * as VueGoogleMaps from 'vue2-google-maps'
-import axios from 'axios'
 import store from './store'
 import router from './router'
+import axios from 'axios'
 import vuetify from './plugins/vuetify';
 import VueApexCharts from 'vue-apexcharts'
 import VueNativeSock from 'vue-native-websocket'
+import * as VeeValidate from 'vee-validate';
+import validatorMessage from 'vee-validate/dist/locale/fr'
 
+VeeValidate.Validator.localize({fr : validatorMessage})
+const options = {
+  locale : 'fr'
+}
 
+Vue.use(VeeValidate,options)
 
 Vue.config.productionTip = false
 
@@ -26,10 +33,14 @@ Vue.use(VueGoogleMaps, {
   }
 })
 
-Vue.use(VueNativeSock, 'ws://192.168.0.32:8080/', {
+Vue.use(VueNativeSock, 'ws://localhost:3001/', {
   connectManually: true,
 })
 
+const token = localStorage.getItem('jwtToken')
+if (token) {
+  axios.defaults.headers.common['Authorization'] = token
+}
 
 new Vue({
   vuetify,
