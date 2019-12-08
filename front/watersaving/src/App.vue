@@ -238,7 +238,7 @@ export default {
               date: resp.datetime,
               alert: tempArrayAlert
             });
-          } else {
+          } else if(resp.alert[0] != "none") {
             this.alarms.push({
               name: resp.name,
               level: resp.level,

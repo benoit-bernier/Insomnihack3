@@ -67,7 +67,7 @@ while True:
 	print("[!] sending sensor data to gateway...")
 
 	try:
-		res = requests.post('http://' + gateway + '/captor/data', data=post_data).content # TODO check retour POST (200 OK)
+		res = requests.post('http://' + gateway + '/sensor/data', data=post_data).content # TODO check retour POST (200 OK)
 		print(res)
 	except Exception as e:
 		print(e)

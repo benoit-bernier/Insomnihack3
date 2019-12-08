@@ -24,13 +24,15 @@
           </template>
         </v-select>
       </v-col>
-      <v-col cols="3">
+     <!-- <v-col cols="3">
         <v-row>
           <v-select style="margin-top: 12px;" :items="date_filter" label="Date"></v-select>
         </v-row>
       </v-col>
+      -->
     </v-row>
     <apexchart
+      ref="chartQuantity"
       v-if="is_show[0]"
       type="line"
       height="300"
@@ -39,6 +41,7 @@
     />
 
     <apexchart
+      ref="chartQuality"
       v-if="is_show[1]"
       type="line"
       height="300"
@@ -46,6 +49,7 @@
       :series="series_quality"
     />
     <apexchart
+      ref="chartTemperature"
       v-if="is_show[2]"
       type="line"
       height="300"
@@ -53,6 +57,7 @@
       :series="series_temperature"
     />
     <apexchart
+      ref="chartHumidity"
       v-if="is_show[3]"
       type="line"
       height="300"
@@ -60,6 +65,7 @@
       :series="series_humidity"
     />
     <apexchart
+      ref="chartIrradiance"
       v-if="is_show[4]"
       type="line"
       height="300"
@@ -253,7 +259,7 @@ export default {
     };
   },
   created() {
-    this.$store.dispatch("changeToolbarState", "Statistiques")
+    this.$store.dispatch("changeToolbarState", "Statistiques");
     if (localStorage.getItem("propsWellId") != null) {
       if (parseInt(localStorage.getItem("propsWellId"))) {
         this.name_select.id = parseInt(localStorage.getItem("propsWellId"));
@@ -262,6 +268,25 @@ export default {
       }
     }
     this.get_all_name();
+    this.$options.sockets.onmessage = ms => {
+      var resp = JSON.parse(ms.data);
+      console.log("new entry :" + resp);
+      if (
+        resp.alert[0] != "nodata" &&
+        resp.data.sensor_id == this.name_select.id
+      ) {
+        this.series_quantity[0].data.push(resp.data.quantity);
+        this.series_quality[0].data.push(resp.data.quality);
+        this.series_temperature[0].data.push(resp.data.temp);
+        this.series_humidity[0].data.push(resp.data.humidity);
+        this.series_irradiance[0].data.push(resp.data.irradiance);
+      }
+      this.$refs.chartQuantity.updateSeries([{data: this.series_quantity[0].data}]);
+      this.$refs.chartQuality.updateSeries([{data: this.series_quantity[0].data}]);
+      this.$refs.chartTemperature.updateSeries([{data: this.series_quantity[0].data}]);
+      this.$refs.chartHumidity.updateSeries([{data: this.series_quantity[0].data}]);
+      this.$refs.chartIrradiance.updateSeries([{data: this.series_quantity[0].data}]);
+    };
   },
   methods: {
     async get_all_name() {
