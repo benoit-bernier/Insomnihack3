@@ -24,13 +24,15 @@
           </template>
         </v-select>
       </v-col>
-      <v-col cols="3">
+      <!-- <v-col cols="3">
         <v-row>
           <v-select style="margin-top: 12px;" :items="date_filter" label="Date"></v-select>
         </v-row>
       </v-col>
+      -->
     </v-row>
     <apexchart
+      ref="chartQuantity"
       v-if="is_show[0]"
       type="line"
       height="300"
@@ -39,6 +41,7 @@
     />
 
     <apexchart
+      ref="chartQuality"
       v-if="is_show[1]"
       type="line"
       height="300"
@@ -46,6 +49,7 @@
       :series="series_quality"
     />
     <apexchart
+      ref="chartTemperature"
       v-if="is_show[2]"
       type="line"
       height="300"
@@ -53,6 +57,7 @@
       :series="series_temperature"
     />
     <apexchart
+      ref="chartHumidity"
       v-if="is_show[3]"
       type="line"
       height="300"
@@ -60,6 +65,7 @@
       :series="series_humidity"
     />
     <apexchart
+      ref="chartIrradiance"
       v-if="is_show[4]"
       type="line"
       height="300"
@@ -134,7 +140,7 @@ export default {
         },
         grid: {
           row: {
-            colors: ["#f3f3f3", "transparent"], // takes an array which will be repeated on columns
+            colors: ["#c3c3c3", "transparent"], // takes an array which will be repeated on columns
             opacity: 0.5
           }
         },
@@ -147,6 +153,13 @@ export default {
           height: 350,
           zoom: {
             enabled: false
+          },
+          animations: {
+            enabled: true,
+            easing: "linear",
+            dynamicAnimation: {
+              speed: 1000
+            }
           }
         },
         dataLabels: {
@@ -174,6 +187,13 @@ export default {
           height: 350,
           zoom: {
             enabled: false
+          },
+          animations: {
+            enabled: true,
+            easing: "linear",
+            dynamicAnimation: {
+              speed: 1000
+            }
           }
         },
         dataLabels: {
@@ -201,6 +221,13 @@ export default {
           height: 350,
           zoom: {
             enabled: false
+          },
+          animations: {
+            enabled: true,
+            easing: "linear",
+            dynamicAnimation: {
+              speed: 1000
+            }
           }
         },
         dataLabels: {
@@ -228,6 +255,13 @@ export default {
           height: 350,
           zoom: {
             enabled: false
+          },
+          animations: {
+            enabled: true,
+            easing: "linear",
+            dynamicAnimation: {
+              speed: 1000
+            }
           }
         },
         dataLabels: {
@@ -253,7 +287,7 @@ export default {
     };
   },
   created() {
-    this.$store.dispatch("changeToolbarState", "Statistiques")
+    this.$store.dispatch("changeToolbarState", "Statistiques");
     if (localStorage.getItem("propsWellId") != null) {
       if (parseInt(localStorage.getItem("propsWellId"))) {
         this.name_select.id = parseInt(localStorage.getItem("propsWellId"));
@@ -262,6 +296,57 @@ export default {
       }
     }
     this.get_all_name();
+    this.$options.sockets.onmessage = ms => {
+      var resp = JSON.parse(ms.data);
+      console.log("new entry :" + resp);
+      if (
+        resp.alert[0] != "nodata" &&
+        resp.data.sensor_id == this.name_select.id
+      ) {
+        if(this.series_quantity[0].data.length == 10){
+        this.series_quantity[0].data.shift();
+        this.series_quality[0].data.shift();
+        this.series_temperature[0].data.shift();
+        this.series_humidity[0].data.shift();
+        this.series_irradiance[0].data.shift();
+        }
+        this.series_quantity[0].data.push({
+          x: resp.data.datetime,
+          y: resp.data.quantity
+        });
+        this.series_quality[0].data.push({
+          x: resp.data.datetime,
+          y: resp.data.quality
+        });
+        this.series_temperature[0].data.push({
+          x: resp.data.datetime,
+          y: resp.data.temp
+        });
+        this.series_humidity[0].data.push({
+          x: resp.data.datetime,
+          y: resp.data.humidity
+        });
+        this.series_irradiance[0].data.push({
+          x: resp.data.datetime,
+          y: resp.data.irradiance
+        });
+      }
+      this.$refs.chartQuantity.updateSeries([
+        { data: this.series_quantity[0].data }
+      ]);
+      this.$refs.chartQuality.updateSeries([
+        { data: this.series_quality[0].data }
+      ]);
+      this.$refs.chartTemperature.updateSeries([
+        { data: this.series_temperature[0].data }
+      ]);
+      this.$refs.chartHumidity.updateSeries([
+        { data: this.series_humidity[0].data }
+      ]);
+      this.$refs.chartIrradiance.updateSeries([
+        { data: this.series_irradiance[0].data }
+      ]);
+    };
   },
   methods: {
     async get_all_name() {
@@ -284,11 +369,26 @@ export default {
         this.series_humidity[0].data = [];
         this.series_irradiance[0].data = [];
         response.data.data.forEach(element => {
-          this.series_quantity[0].data.push(element.quantity);
-          this.series_quality[0].data.push(element.quality);
-          this.series_temperature[0].data.push(element.temp);
-          this.series_humidity[0].data.push(element.humidity);
-          this.series_irradiance[0].data.push(element.irradiance);
+          this.series_quantity[0].data.push({
+            x: element.datetime,
+            y: element.quantity
+          });
+          this.series_quality[0].data.push({
+            x: element.datetime,
+            y: element.quality
+          });
+          this.series_temperature[0].data.push({
+            x: element.datetime,
+            y: element.temp
+          });
+          this.series_humidity[0].data.push({
+            x: element.datetime,
+            y: element.humidity
+          });
+          this.series_irradiance[0].data.push({
+            x: element.datetime,
+            y: element.irradiance
+          });
         });
         let tempValue = this.value;
         this.value = [];

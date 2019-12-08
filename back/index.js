@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const wsAuth = require('./middlewares/wsAuth');
-const server = require('http').createServer(app);
+const http = require('http');
 const auth = require('./middlewares/auth');
 
 const WebSocket = require('ws');
@@ -77,8 +77,8 @@ wss.on('connection', ws => {
   })
 })
 
-server.listen(3000, function () {
-  console.log('server listening on port 3000');
+http.createServer(app).listen(3000, () => {
+  console.log('Listening on ' + 3000);
 });
 
 exports.app = app;

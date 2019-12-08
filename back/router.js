@@ -1,6 +1,4 @@
 
-const express = require('express');
-
 module.exports = (app,auth) => {
 
     const well = require("./controllers/wellController");

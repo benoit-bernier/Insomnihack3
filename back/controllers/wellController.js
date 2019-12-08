@@ -36,6 +36,7 @@ exports.allDataById = (req, res) => {
     }, (err, results) => {
         if (err) return console.log(err);
         if (results) {
+            results.data = results.data.slice(results.data.length-10, results.data.length); // juste resturn the last 10 
             res.send(results);
         } else {
             res.end();
