@@ -25,7 +25,7 @@
               <v-list-item>
                 <v-list-item-content>
                   <v-list-item-title>
-                    <h3>Materiels déployés</h3>
+                    <h3>Materiel déployé</h3>
                   </v-list-item-title>
                 </v-list-item-content>
               </v-list-item>
@@ -155,7 +155,7 @@
             <v-row>
               <v-col cols="6">
                 <v-text-field
-                  label="Nombre d'adult"
+                  label="Nombre d'adultes"
                   type="text"
                   v-model="well.history.data_person.adult"
                   required
@@ -163,7 +163,7 @@
               </v-col>
               <v-col cols="6">
                 <v-text-field
-                  label="Nombre d'enfant"
+                  label="Nombre d'enfants"
                   type="text"
                   v-model="well.history.data_person.child"
                   required
@@ -177,7 +177,7 @@
               </v-col>
             </v-row>
 
-            <v-row style="margin-bottom:-30px">
+            <v-row style="margin-bottom:30px">
               <v-col cols="10">
                 <v-text-field label="Commentaires" type="text" v-model="commententay" required></v-text-field>
               </v-col>

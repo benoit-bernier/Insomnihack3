@@ -11,10 +11,10 @@
             <v-icon v-if="item.level == 1" color="yellow">mdi-alert</v-icon>
             <v-icon v-else-if="item.level == 2" color="orange">mdi-alert</v-icon>
             <v-icon
-              v-else-if="item.level == 3 && item.alert[0] != 'la connection'"
+              v-else-if="item.level == 3 && item.alert[0] != 'la connexion'"
               color="red"
             >mdi-alert</v-icon>
-            <v-icon v-else-if="item.alert[0] == 'la connection'" color="black">mdi-alert</v-icon>
+            <v-icon v-else-if="item.alert[0] == 'la connexion'" color="black">mdi-alert</v-icon>
           </v-list-item-action>
           <v-list-item-content>
             <v-list-item-title>{{ item.name }}</v-list-item-title>
@@ -206,8 +206,7 @@ export default {
         this.$options.sockets.onmessage = ms => {
           var resp = JSON.parse(ms.data);
           console.log(resp);
-          (this.snackbar = true),
-            (this.text = "Nouvelle alerte detectée " + resp.name);
+        
           let tempArrayAlert = [];
           resp.alert.forEach(elt => {
             switch (elt) {
@@ -231,6 +230,8 @@ export default {
             }
           });
           if (resp.alert[0] == "nodata") {
+              (this.snackbar = true),
+            (this.text = "Nouvelle alerte detectée " + resp.name);
             this.alarms.push({
               is_down: true,
               name: resp.name,
@@ -239,6 +240,8 @@ export default {
               alert: tempArrayAlert
             });
           } else if(resp.alert[0] != "none") {
+              (this.snackbar = true),
+            (this.text = "Nouvelle alerte detectée " + resp.name);
             this.alarms.push({
               name: resp.name,
               level: resp.level,
