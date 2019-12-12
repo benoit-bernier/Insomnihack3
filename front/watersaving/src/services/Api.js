@@ -3,7 +3,7 @@ import store from '../store'
 import Router from '../router'
 
 const axiosInstance = axios.create({
-  baseURL: 'http://localhost:3000'
+  baseURL: 'http://'+process.env.VUE_APP_SERVER_URL+':3000/'
 })
 
 axiosInstance.interceptors.response.use(response => response, error =>{
