@@ -113,9 +113,9 @@
               </v-list-item>
               <div style="display:block;height:4px;background-color:#44A4FF; margin-bottom:20px"></div>
 
-              <v-list-item two-line>
+              <v-list-item two-line  v-for="(comment) in well.history.comments" :key="comment">
                 <v-list-item-content>
-                  <v-list-item-title>- Ajout d'un renfort</v-list-item-title>
+                  <v-list-item-title >- {{comment}}</v-list-item-title>
                 </v-list-item-content>
               </v-list-item>
             </v-card>
@@ -171,18 +171,24 @@
               </v-col>
             </v-row>
 
-            <h3>Notes sur l'installation</h3>
-            <v-row v-for="comment in comments" :key="comment">
+            <v-row>
               <v-col cols="10">
-                <v-text-field
-                  label="Construction"
-                  type="text"
-                  v-model="well.history.costing.build"
-                  required
-                ></v-text-field>
+                <h3>Notes sur l'installation</h3>
+              </v-col>
+            </v-row>
+
+            <v-row style="margin-bottom:-30px">
+              <v-col cols="10">
+                <v-text-field label="Commentaires" type="text" v-model="commententay" required></v-text-field>
               </v-col>
               <v-col cols="2">
-                <v-btn color="blue darken-1" text @click="add()" >Ajouter</v-btn>
+                <v-btn color="blue darken-1" text @click="add()">Ajouter</v-btn>
+              </v-col>
+            </v-row>
+            <v-row style="margin-top:-15px" v-for="comment in comments" :key="comment">
+              <v-col cols="12">
+                <p style="color:black">{{comment}}</p>
+                <v-divider></v-divider>
               </v-col>
             </v-row>
 
@@ -242,8 +248,9 @@ export default {
   data() {
     return {
       dialog_update: false,
-      components: [{}],
+      components: [],
       comments: [],
+      commententay: "",
       snackbar_error: false,
       snackbar_success: false,
       text_snack: "",
@@ -265,7 +272,7 @@ export default {
             adult: 0,
             child: 0
           },
-          comment: [],
+          comments: [],
           costing: {
             earthwork: 0,
             build: 0,
@@ -284,6 +291,7 @@ export default {
       this.dialog_update = true;
     },
     async update() {
+      this.well.history.comments = this.comments
       console.log("WELL : " + JSON.stringify(this.well));
       await well_service.put_well(this.well).then(response => {
         console.log("rep : " + JSON.stringify(response));
@@ -306,15 +314,17 @@ export default {
     },
     async get_all_name() {
       await well_service.get_all_name().then(response => {
+        console.log("COMPONENTS : " + JSON.stringify(response.data[0].history.comments))
         this.components = response.data;
       });
     },
-    add(){
-      this.comment.push({})
+    add() {
+      this.comments.push(this.commententay);
+      this.commententay = "";
     },
     change_history() {
       this.well = this.current_well;
     }
   }
 };
-</script>
+</script> 
