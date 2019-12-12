@@ -199,7 +199,7 @@ export default {
     connectAndListenWS() {
       console.log("connectAndListenWS");
       if (this.isAuth) {
-        this.$connect("ws://localhost:3001/", { format: "json" });
+        this.$connect("ws://"+process.env.VUE_APP_SERVER_URL+":3001/", { format: "json" });
         this.$socket.onopen = () => {
           this.$socket.sendObj({ token: this.$store.getters.AccessToken }); //send the jwt
         };
