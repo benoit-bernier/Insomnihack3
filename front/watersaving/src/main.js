@@ -28,12 +28,12 @@ Vue.component('apexchart', VueApexCharts)
 
 Vue.use(VueGoogleMaps, {
   load: {
-    key: process.env.VUE_APP_GOOGLE_MAP_API,
+    key: "AIzaSyBp-JtJsI065C43p7IBLWr-gD0VHdIS_II",
     libraries: 'places', 
   }
 })
 
-Vue.use(VueNativeSock, 'ws://localhost:3001/', {
+Vue.use(VueNativeSock, 'ws://ec2-54-91-83-8.compute-1.amazonaws.com:3001/', {
   connectManually: true,
 })
 

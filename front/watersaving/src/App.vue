@@ -11,10 +11,10 @@
             <v-icon v-if="item.level == 1" color="yellow">mdi-alert</v-icon>
             <v-icon v-else-if="item.level == 2" color="orange">mdi-alert</v-icon>
             <v-icon
-              v-else-if="item.level == 3 && item.alert[0] != 'la connection'"
+              v-else-if="item.level == 3 && item.alert[0] != 'la connexion'"
               color="red"
             >mdi-alert</v-icon>
-            <v-icon v-else-if="item.alert[0] == 'la connection'" color="black">mdi-alert</v-icon>
+            <v-icon v-else-if="item.alert[0] == 'la connexion'" color="black">mdi-alert</v-icon>
           </v-list-item-action>
           <v-list-item-content>
             <v-list-item-title>{{ item.name }}</v-list-item-title>
@@ -199,15 +199,14 @@ export default {
     connectAndListenWS() {
       console.log("connectAndListenWS");
       if (this.isAuth) {
-        this.$connect("ws://localhost:3001/", { format: "json" });
+        this.$connect("ws://ec2-54-91-83-8.compute-1.amazonaws.com:3001/", { format: "json" });
         this.$socket.onopen = () => {
           this.$socket.sendObj({ token: this.$store.getters.AccessToken }); //send the jwt
         };
         this.$options.sockets.onmessage = ms => {
           var resp = JSON.parse(ms.data);
           console.log(resp);
-          (this.snackbar = true),
-            (this.text = "Nouvelle alerte detectée " + resp.name);
+        
           let tempArrayAlert = [];
           resp.alert.forEach(elt => {
             switch (elt) {
@@ -231,6 +230,8 @@ export default {
             }
           });
           if (resp.alert[0] == "nodata") {
+              (this.snackbar = true),
+            (this.text = "Nouvelle alerte detectée " + resp.name);
             this.alarms.push({
               is_down: true,
               name: resp.name,
@@ -239,6 +240,8 @@ export default {
               alert: tempArrayAlert
             });
           } else if(resp.alert[0] != "none") {
+              (this.snackbar = true),
+            (this.text = "Nouvelle alerte detectée " + resp.name);
             this.alarms.push({
               name: resp.name,
               level: resp.level,

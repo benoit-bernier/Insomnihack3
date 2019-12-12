@@ -153,7 +153,7 @@ export default {
     headers: [
       { text: "ID Référent", value: "id" },
       {
-        text: "Noms",
+        text: "Nom",
         align: "left",
         sortable: false,
         value: "name"
